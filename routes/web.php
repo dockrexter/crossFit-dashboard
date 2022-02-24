@@ -24,4 +24,10 @@ Route::resource('roles', RoleController::class);
 // Permissions
 Route::resource('permissions', PermissionController::class);
 
+// Time Tables
+Route::resource('time_tables', TimeTableController::class);
+
+// Workouts Of Days
+Route::resource('workouts_of_days', WorkOutsOfDayController::class);
+
 require __DIR__.'/auth.php';

@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Register User
+Route::post('register/user','RegisterController@register');
+
+// Login User
+Route::post('login/user','LoginController@login');
+
+// Return Time Tables Listing
+Route::get('listing/timetable','ReturnDataListingController@timetables');

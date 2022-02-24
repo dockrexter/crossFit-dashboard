@@ -50,23 +50,31 @@ class UserController extends Controller
     {
         try{
             $this->validate($request, [
-                'name' => ['required', 'string', 'max:255', 'regex:^([a-zA-Z]+(.)?[\s]*)$^'],
+                'first_name' => ['required', 'string', 'max:255', 'regex:^([a-zA-Z]+(.)?[\s]*)$^'],
+                'last_name' => ['required', 'string', 'max:255', 'regex:^([a-zA-Z]+(.)?[\s]*)$^'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
                 'password' => ['required', 'string', 'min:8', 'max:20', 'confirmed'],
                 'phone_number' => ['required','numeric','digits_between:11,11'],
                 'dob' => ['required', 'date'],
                 'picture' => ['nullable', 'image'],
                 'codice_fiscale' => ['nullable', 'file'],
+                'status' => ['required','numeric'],
             ]);
 
+            if($request->hasFile('picture')){
+                $picture = User::InsertImage($request->file('picture'));
+            }
+            
             $user = new User();
-            $user->name = $request->name;
+            $user->first_name = $request->first_name;
+            $user->last_name = $request->last_name;
             $user->email = $request->email;
             $user->password = Hash::make($request->password);
             $user->phone_number = $request->phone_number;
             $user->dob = $request->dob;
-            $user->picture = $request->picture;
+            $user->picture = !empty($picture) ? $picture : NULL;
             $user->codice_fiscale = $request->codice_fiscale;
+            $user->status = $request->status;
             $user->save();
             $user->assignRole($request->role);
             return ['code'=>'200','message'=>'success'];
@@ -116,23 +124,31 @@ class UserController extends Controller
     {
         try{
             $this->validate($request, [
-                'name' => ['required', 'string', 'max:255', 'regex:^([a-zA-Z]+(.)?[\s]*)$^'],
+                'first_name' => ['required', 'string', 'max:255', 'regex:^([a-zA-Z]+(.)?[\s]*)$^'],
+                'last_name' => ['required', 'string', 'max:255', 'regex:^([a-zA-Z]+(.)?[\s]*)$^'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$id],
-                'password' => ['nullable', 'string', 'min:8', 'max:20', 'confirmed'],
                 'phone_number' => ['required', 'numeric','digits_between:11,11'],
                 'dob' => ['required', 'date'],
                 'picture' => ['nullable', 'image'],
                 'codice_fiscale' => ['nullable', 'file'],
+                'status' => ['required','numeric'],
             ]);
 
             $user = User::find($id);
-            $user->name = $request->name;
+            $user->first_name = $request->first_name;
+            $user->last_name = $request->last_name;
             $user->email = $request->email;
-            $user->password = Hash::make($request->password);
             $user->phone_number = $request->phone_number;
             $user->dob = $request->dob;
-            $user->picture = $request->picture;
+            if($request->hasFile('picture')){
+                if(!empty($user->picture)){
+                    unlink(public_path().'/user_pictures/'.$user->picture);
+                }
+                $picture = User::InsertImage($request->file('picture'));
+            }
+            $user->picture = !empty($picture) ? $picture : NULL;
             $user->codice_fiscale = $request->codice_fiscale;
+            $user->status = $request->status;
             $user->save();
             $user->syncRoles($request->role);
             return ['code'=>'200','message'=>'success'];

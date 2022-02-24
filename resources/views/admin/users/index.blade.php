@@ -32,6 +32,7 @@
                                     <th>Sr.No</th>
                                     <th>Name</th>
                                     <th>Email</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -58,8 +59,14 @@
                                 <div class="row">
                                     <div class="col-md-6 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="name">Name</label>
-                                            <input type="text" id="name" class="form-control" placeholder="User Name" name="name" required/>
+                                            <label class="form-label" for="first_name">First Name</label>
+                                            <input type="text" id="first_name" class="form-control" placeholder="First Name" name="first_name" required/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12">
+                                        <div class="mb-1">
+                                            <label class="form-label" for="last_name">Last Name</label>
+                                            <input type="text" id="last_name" class="form-control" placeholder="Last Name" name="last_name" required/>
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-12">
@@ -82,6 +89,12 @@
                                     </div>
                                     <div class="col-md-6 col-12">
                                         <div class="mb-1">
+                                            <label for="picture" class="form-label">Profile Photo</label>
+                                            <input class="form-control" name="picture" type="file" id="picture">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12">
+                                        <div class="mb-1">
                                             <label class="form-label" for="password">Password</label>
                                             <input type="password" id="password" class="form-control" placeholder="Password" name="password" required/>
                                         </div>
@@ -92,7 +105,17 @@
                                             <input type="password" id="password_confirmation" class="form-control" placeholder="Confirm Password" name="password_confirmation" required/>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-md-6 col-12">
+                                        <div class="mb-1">
+                                            <label class="form-label" for="status">Status</label>
+                                            <select name="status" id="status" class="select2 form-select" data-placeholder="Select Status">
+                                                <option value=""></option>
+                                                <option value="1">Active</option>
+                                                <option value="0">InActive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12">
                                         <div class="mb-1">
                                             <label class="form-label" for="role">Roles</label>
                                             <select name="role" id="role" class="select2 form-select" data-placeholder="Select Role">
@@ -130,8 +153,14 @@
                                 <div class="row">
                                     <div class="col-md-6 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="edit_name">Name</label>
-                                            <input type="text" id="edit_name" class="form-control" placeholder="User Name" name="name" required/>
+                                            <label class="form-label" for="edit_first_name">First Name</label>
+                                            <input type="text" id="edit_first_name" class="form-control" placeholder="First Name" name="first_name" required/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12">
+                                        <div class="mb-1">
+                                            <label class="form-label" for="edit_last_name">Last Name</label>
+                                            <input type="text" id="edit_last_name" class="form-control" placeholder="Last Name" name="last_name" required/>
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-12">
@@ -152,7 +181,23 @@
                                             <input type="text" id="edit_dob" class="form-control flatpickr-basic" placeholder="YYYY-MM-DD" name= "dob"/>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-md-6 col-12">
+                                        <div class="mb-1">
+                                            <label for="edit_picture" class="form-label">Profile Photo</label>
+                                            <input class="form-control" name="picture" type="file" id="edit_picture">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12">
+                                        <div class="mb-1">
+                                            <label class="form-label" for="edit_status">Status</label>
+                                            <select name="status" id="edit_status" class="select2 form-select" data-placeholder="Select Status">
+                                                <option value=""></option>
+                                                <option value="1">Active</option>
+                                                <option value="0">InActive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12">
                                         <div class="mb-1">
                                             <label class="form-label" for="edit_role">Roles</label>
                                             <select name="role" id="edit_role" class="select2 form-select" data-placeholder="Select Role">
@@ -195,10 +240,59 @@
                         data : 'id'
                     },
                     {
-                        data: 'name'
+                        name: 'users.first_name',
+                        render: function(data, type, full, meta) {
+                            var $user_img = full['picture'],
+                                $name = full['first_name']+' '+full['last_name'];
+                            var assetPath = '{{ URL::asset('/user_pictures') }}';
+                            if ($user_img) {
+                                // For Profile Photo
+                                var $output =
+                                    '<img src="' + assetPath + '/' + $user_img + '" alt="Profile Photo" width="35" height="35">';
+                            } else {
+                                // For Avatar badge
+                                var stateNum = full['status'];
+                                var states = ['success', 'danger', 'warning', 'info', 'dark', 'primary', 'secondary'];
+                                var $state = states[stateNum],
+                                    $initials = $name.match(/\b\w/g) || [];
+                                $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
+                                $output = '<span class="avatar-content">' + $initials + '</span>';
+                            }
+                            var colorClass = $user_img === '' ? ' bg-light-' + $state + ' ' : '';
+                            // Creates full output for row
+                            var $row_output =
+                                '<div class="d-flex justify-content-left align-items-center">' +
+                                '<div class="avatar ' +
+                                colorClass +
+                                ' me-1">' +
+                                $output +
+                                '</div>' +
+                                '<div class="d-flex flex-column">' +
+                                '<span class="emp_name text-truncate fw-bold">' +
+                                $name +
+                                '</span>' +
+                                '</div>' +
+                                '</div>';
+                            return $row_output;
+                        }
                     },
                     {
                         data: 'email'
+                    },
+                    {
+                        name: 'users.status',
+                        render: function(data, type, full, meta) {
+                            if (full['status']) {
+                                // For Active Status
+                                var $status_output =
+                                    '<span class="badge bg-success">Active</span>';
+                            } else {
+                                // For InActive Status
+                                var $status_output =
+                                    '<span class="badge bg-danger">Inactive</span>';
+                            }
+                            return $status_output;
+                        }
                     },
                     {
                         data: '',
@@ -360,6 +454,7 @@
                             })
                         }
                         else{
+                            $('#edit_form')[0].reset();
                             $("#edit_modal").modal("hide");
                             datatable.ajax.reload();
                             Toast.fire({
@@ -378,11 +473,14 @@
                 url: "{{url('users')}}" + "/" + id + "/edit",
                 type: "get",
                 success: function (response) {
-                    $("#edit_name").val(response.name);
+                    var role = response.roles.length > 0 ? response.roles[0].id : '';
+                    $("#edit_first_name").val(response.first_name);
+                    $("#edit_last_name").val(response.last_name);
                     $("#edit_email").val(response.email);
                     $("#edit_phone_number").val(response.phone_number);
                     $("#edit_dob").val(response.dob);
-                    $("#edit_role").val(response.roles[0]['id']).select2();
+                    $("#edit_status").val(response.status).select2();
+                    $('#edit_role').val(role).select2();
                     $("#edit_modal").modal("show");
                 },
             });

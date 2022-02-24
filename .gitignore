@@ -2,6 +2,8 @@
 /public/hot
 /public/css/app.css
 /public/js/app.js
+/public/user_pictures
+/public/user_codice_fiscales
 /public/storage
 /storage/*.key
 /vendor
